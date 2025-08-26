@@ -1,0 +1,77 @@
+name: CI - Build and Test in Docker
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t my-maven-app .
+
+      - name: Run tests inside container
+        run: docker run --rm my-maven-app
+
+      - name: Upload Cucumber Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: target/cucumber-report.html
+
+      - name: Set test result message
+        id: set-message
+        run: |
+          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
+            echo "✅ All tests passed successfully for $GITHUB_REPOSITORY on branch $GITHUB_REF"
+            echo "message=✅ All tests passed successfully for $GITHUB_REPOSITORY on branch $GITHUB_REF" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Some tests failed in $GITHUB_REPOSITORY on branch $GITHUB_REF"
+            echo "message=❌ Some tests failed in $GITHUB_REPOSITORY on branch $GITHUB_REF" >> $GITHUB_OUTPUT
+          fi
+
+  deploy-cucumber-report:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Cucumber reports
+        uses: actions/download-artifact@v4
+        with:
+          path: target/cucumber-report.html
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          publish_dir: target/cucumber-report.html
+          publish_branch: gh-pages
+
+  notify:
+    needs: [ build-and-test, deploy-cucumber-report]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ needs.build-and-test.result }}
+          text: ${{ needs.build-and-test.outputs.buildStatusMessage }}
+          fields: repo,message,commit,author,action,eventName,ref
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.NEWSLETTER_CHANNEL }}
+
