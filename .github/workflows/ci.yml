@@ -24,6 +24,7 @@ jobs:
         run: docker run --name test-run my-maven-app
 
       - name: Copy Cucumber report
+        if: always()
         run: |
             docker cp test-run:/app/target/cucumber-report.html ./cucumber-report.html || echo "No report found"
             docker rm test-run
