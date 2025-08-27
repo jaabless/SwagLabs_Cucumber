@@ -68,9 +68,8 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GH_PAT }}
-          publish_dir: ./
+          publish_dir: target/cucumber-report.html
           publish_branch: gh-pages
-
 
   notify:
     needs: [ build-and-test, deploy-cucumber-report]
