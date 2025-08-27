@@ -16,6 +16,9 @@ public class CartPage extends BasePage {
     @FindBy(id = "continue-shopping")
     private WebElement continueShoppingButton;
 
+    @FindBy(id = "checkout")
+    private WebElement checkoutButton;
+
     public CartPage(WebDriver driver) {
         super(driver);
     }
@@ -31,4 +34,10 @@ public class CartPage extends BasePage {
     public void continueShopping() {
         continueShoppingButton.click();
     }
+
+    public void clickCheckout() {
+        checkoutButton.click();
+    }
+
+
 }
