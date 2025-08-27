@@ -71,6 +71,7 @@ jobs:
           publish_dir: ./
           publish_branch: gh-pages
 
+
   notify:
     needs: [ build-and-test, deploy-cucumber-report]
     if: always()
