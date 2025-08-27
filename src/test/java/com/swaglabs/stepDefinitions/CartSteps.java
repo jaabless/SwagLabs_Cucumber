@@ -5,6 +5,7 @@ import com.swaglabs.config.BaseTest;
 import com.swaglabs.pages.CartPage;
 import com.swaglabs.pages.InventoryPage;
 import com.swaglabs.pages.LoginPage;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -16,14 +17,18 @@ public class CartSteps {
     InventoryPage inventoryPage = new InventoryPage(BaseTest.getDriver());
     CartPage cartPage = new CartPage(BaseTest.getDriver());
 
-    @Given("I am logged in and have added an item to cart")
-    public void i_am_logged_in_and_have_added_an_item_to_cart() {
-        loginPage.enterUsername("standard_user");
-        loginPage.enterPassword("secret_sauce");
+    @Given("I log in as username {string} and password {string}")
+    public void i_log_in_as(String username, String password) {
+        loginPage.enterCredentials(username, password);
         loginPage.clickLogin();
+    }
+
+    @And("I have added an item to cart")
+    public void i_have_added_an_item_to_cart(){
         inventoryPage.addFirstItemToCart();
         Assert.assertEquals("1", inventoryPage.getCartBadgeCount());
     }
+
 
     @When("I go to the cart page")
     public void i_go_to_the_cart_page() {
