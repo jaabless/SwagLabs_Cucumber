@@ -20,14 +20,19 @@ public class LoginSteps {
         Assert.assertTrue(BaseTest.getDriver().getCurrentUrl().contains("saucedemo.com"));
     }
 
-    @When("I enter username {string}")
-    public void i_enter_username(String username) {
-        loginPage.enterUsername(username);
-    }
+//    @When("I enter username {string}")
+//    public void i_enter_username(String username) {
+//        loginPage.enterUsername(username);
+//    }
+//
+//    @When("I enter password {string}")
+//    public void i_enter_password(String password) {
+//        loginPage.enterPassword(password);
+//    }
 
-    @When("I enter password {string}")
-    public void i_enter_password(String password) {
-        loginPage.enterPassword(password);
+    @When("I log in with username {string} and password {string}")
+    public void i_enter_my_credentials(String username, String password) {
+        loginPage.enterCredentials(username,password);
     }
 
     @And("I click login button")
