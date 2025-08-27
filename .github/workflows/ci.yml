@@ -24,6 +24,7 @@ jobs:
         run: docker run --rm my-maven-app
 
       - name: List target directory
+        if: always()
         run: ls -R target || true
 
 
