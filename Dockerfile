@@ -60,4 +60,4 @@ COPY . .
 RUN mvn clean install || true
 
 # Default command to run tests
-CMD ["mvn", "test"]
+CMD ["mvn", "verify"]
