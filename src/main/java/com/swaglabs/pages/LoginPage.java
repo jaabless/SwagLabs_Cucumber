@@ -24,12 +24,19 @@ public class LoginPage extends BasePage {
         super(driver);
     }
 
-    public void enterUsername(String username) {
+//    public void enterUsername(String username) {
+//        usernameInput.clear();
+//        usernameInput.sendKeys(username);
+//    }
+//
+//    public void enterPassword(String password) {
+//        passwordInput.clear();
+//        passwordInput.sendKeys(password);
+//    }
+
+    public void enterCredentials(String username, String password) {
         usernameInput.clear();
         usernameInput.sendKeys(username);
-    }
-
-    public void enterPassword(String password) {
         passwordInput.clear();
         passwordInput.sendKeys(password);
     }
