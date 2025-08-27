@@ -21,7 +21,7 @@ jobs:
         run: docker build -t my-maven-app .
 
       - name: Run tests inside container
-        run: docker run --name test-run my-maven-app || true
+        run: docker run --name test-run my-maven-app
 
       - name: Copy Cucumber report
         run: |
@@ -41,6 +41,7 @@ jobs:
           path: cucumber-report.html
 
       - name: Set test result message
+        if: always()
         id: set-message
         run: |
           if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
