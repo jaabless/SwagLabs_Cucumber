@@ -62,14 +62,17 @@ jobs:
       - name: Download Cucumber reports
         uses: actions/download-artifact@v4
         with:
-          path: cucumber-report.html
+          name: cucumber-report
+          path: cucumber-report   # this will be a directory
+
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GH_PAT }}
-          publish_dir: cucumber-report.html
+          publish_dir: cucumber-report
           publish_branch: gh-pages
+
 
   notify:
     needs: [ build-and-test, deploy-cucumber-report]
