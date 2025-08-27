@@ -14,10 +14,17 @@ public class InventorySteps {
     LoginPage loginPage = new LoginPage(BaseTest.getDriver());
     InventoryPage inventoryPage = new InventoryPage(BaseTest.getDriver());
 
-    @Given("I am logged in as standard user")
-    public void i_am_logged_in_as_standard_user() {
-        loginPage.enterUsername("standard_user");
-        loginPage.enterPassword("secret_sauce");
+//    @Given("I am logged in as standard user")
+//    public void i_am_logged_in_as_standard_user() {
+//        loginPage.enterUsername("standard_user");
+//        loginPage.enterPassword("secret_sauce");
+//        loginPage.clickLogin();
+//        Assert.assertTrue(BaseTest.getDriver().getCurrentUrl().contains("/inventory.html"));
+//    }
+
+    @Given("I am logged in as username {string} and password {string}")
+    public void i_am_logged_in_as(String username, String password) {
+        loginPage.enterCredentials(username, password);
         loginPage.clickLogin();
         Assert.assertTrue(BaseTest.getDriver().getCurrentUrl().contains("/inventory.html"));
     }
