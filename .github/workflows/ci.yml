@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    outputs:
+      message: ${{ steps.set-message.outputs.message }}
 
     steps:
       - name: Checkout repository
@@ -30,10 +32,6 @@ jobs:
           docker cp test-run:/app/target/cucumber-report.html ./cucumber-report.html || echo "No report found"
           docker rm test-run
 
-      - name: List target directory
-        if: always()
-        run: ls -R target || true
-
       - name: Upload Cucumber Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -47,11 +45,11 @@ jobs:
         run: |
           REPORT_LINK="https://jaabless.github.io/SwagLabs_Cucumber/cucumber-report.html"
           if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
-            MSG="✅ All tests passed successfully for $GITHUB_REPOSITORY on branch $GITHUB_REF"
+            MSG="✅ All tests passed successfully for *${GITHUB_REPOSITORY}* on branch *${GITHUB_REF}*"
           else
-            MSG="❌ Some tests failed in $GITHUB_REPOSITORY on branch $GITHUB_REF"
+            MSG="❌ Some tests failed in *${GITHUB_REPOSITORY}* on branch *${GITHUB_REF}*"
           fi
-          echo "message=${MSG} | 📊 Report: ${REPORT_LINK}" >> $GITHUB_OUTPUT
+          echo "message=${MSG} | 📊 <${REPORT_LINK}|View Full Report>" >> $GITHUB_OUTPUT
 
   deploy-cucumber-report:
     needs: build-and-test
@@ -65,7 +63,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: cucumber-report
-          path: cucumber-report   # this will be a directory
+          path: cucumber-report
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
@@ -82,8 +80,8 @@ jobs:
       - name: Send Slack Notification
         uses: 8398a7/action-slack@v3
         with:
-          status: ${{ needs.build-and-test.result }}
+          status: custom
           text: ${{ needs.build-and-test.outputs.message }}
-          fields: repo,message,commit,author,action,eventName,ref
+          fields: repo,commit,author,ref
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.NEWSLETTER_CHANNEL }}
