@@ -7,10 +7,9 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
 
 public class BaseTest {
@@ -39,7 +38,18 @@ public class BaseTest {
                     driver = new EdgeDriver();
                     driver.manage().window().maximize();
 
-                } else {
+                } else if (browser.equalsIgnoreCase("firefox")) {
+                    WebDriverManager.firefoxdriver().setup();
+                    FirefoxOptions options = new FirefoxOptions();
+                    options.addArguments("--headless=new"); // headless mode
+                    options.addArguments("--no-sandbox");
+                    options.addArguments("--disable-dev-shm-usage");
+    //            driver = new ChromeDriver();
+                    driver = new FirefoxDriver(options); //headless
+                    driver.manage().window().maximize();
+
+                }
+                else {
                     throw new RuntimeException("Unsupported browser: " + browser);
                 }
 
