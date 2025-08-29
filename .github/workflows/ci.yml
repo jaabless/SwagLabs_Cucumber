@@ -21,18 +21,18 @@ jobs:
         run: docker build -t my-maven-app .
 
       - name: Run tests inside container
+        id: run-tests
         run: docker run --name test-run my-maven-app
 
       - name: Copy Cucumber report
         if: always()
         run: |
-            docker cp test-run:/app/target/cucumber-report.html ./cucumber-report.html || echo "No report found"
-            docker rm test-run
+          docker cp test-run:/app/target/cucumber-report.html ./cucumber-report.html || echo "No report found"
+          docker rm test-run
 
       - name: List target directory
         if: always()
         run: ls -R target || true
-
 
       - name: Upload Cucumber Report
         if: always()
@@ -45,13 +45,13 @@ jobs:
         if: always()
         id: set-message
         run: |
+          REPORT_LINK="https://jaabless.github.io/SwagLabs_Cucumber/cucumber-report.html"
           if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
-            echo "✅ All tests passed successfully for $GITHUB_REPOSITORY on branch $GITHUB_REF"
-            echo "message=✅ All tests passed successfully for $GITHUB_REPOSITORY on branch $GITHUB_REF" >> $GITHUB_OUTPUT
+            MSG="✅ All tests passed successfully for $GITHUB_REPOSITORY on branch $GITHUB_REF"
           else
-            echo "❌ Some tests failed in $GITHUB_REPOSITORY on branch $GITHUB_REF"
-            echo "message=❌ Some tests failed in $GITHUB_REPOSITORY on branch $GITHUB_REF" >> $GITHUB_OUTPUT
+            MSG="❌ Some tests failed in $GITHUB_REPOSITORY on branch $GITHUB_REF"
           fi
+          echo "message=${MSG} | 📊 Report: ${REPORT_LINK}" >> $GITHUB_OUTPUT
 
   deploy-cucumber-report:
     needs: build-and-test
@@ -67,7 +67,6 @@ jobs:
           name: cucumber-report
           path: cucumber-report   # this will be a directory
 
-
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -75,9 +74,8 @@ jobs:
           publish_dir: cucumber-report
           publish_branch: gh-pages
 
-
   notify:
-    needs: [ build-and-test, deploy-cucumber-report]
+    needs: [ build-and-test, deploy-cucumber-report ]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -85,8 +83,7 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ needs.build-and-test.result }}
-          text: ${{ needs.build-and-test.outputs.buildStatusMessage }}
+          text: ${{ needs.build-and-test.outputs.message }}
           fields: repo,message,commit,author,action,eventName,ref
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.NEWSLETTER_CHANNEL }}
-
