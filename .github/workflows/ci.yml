@@ -9,8 +9,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    outputs:
-      message: ${{ steps.set-message.outputs.message }}
 
     steps:
       - name: Checkout repository
@@ -31,6 +29,10 @@ jobs:
         run: |
           docker cp test-run:/app/target/cucumber-report.html ./cucumber-report.html || echo "No report found"
           docker rm test-run
+
+      - name: List target directory
+        if: always()
+        run: ls -R target || true
 
       - name: Upload Cucumber Report
         if: always()
@@ -63,7 +65,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: cucumber-report
-          path: cucumber-report
+          path: cucumber-report   # this will be a directory
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
